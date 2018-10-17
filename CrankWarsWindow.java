@@ -21,7 +21,7 @@ public class CrankWarsWindow extends Frame {
 		"Staten Island"
 	};
 	private int curLocation = 0;
-	private String[] drugs = {
+	private String[] drugs = { // Do try to keep these alphabetical
 		"Acid", 
 		"Cocaine", 
 		"Crank",
@@ -45,7 +45,7 @@ public class CrankWarsWindow extends Frame {
 	Dialog jetDialog;
 	MenuBar mainWindowMenu;
 	Menu shopMenu;
-	MenuItem shopBuyGun, shopBuyAmmo, shopBuy10Ammo;
+	MenuItem shopBuyGun, shopBuyAmmo, shopBuy10Ammo, shopBuy10Space;
 	
 	// Primary Game Window
 	public CrankWarsWindow () {
@@ -58,13 +58,15 @@ public class CrankWarsWindow extends Frame {
 			}
 		});
 		
-		// TODO: buying space upgrades
 		// Make Menus
+		// TODO: "cheat menu" so I can more easily test things like paying back loans
+		// TODO: Hospital for healing
 		mainWindowMenu = new MenuBar();
 		shopMenu = new Menu("Shop");
 		shopBuyGun = new MenuItem("Buy Gun ($100)");
 		shopBuyAmmo = new MenuItem("Buy Ammo ($10)");
 		shopBuy10Ammo = new MenuItem("Buy 10 Ammo ($100)");
+		shopBuy10Space = new MenuItem("Buy 20 Space ($40)");
 		// Make Menu listeners
 		shopBuyGun.addActionListener(new ActionListener() {
 			@Override
@@ -80,6 +82,12 @@ public class CrankWarsWindow extends Frame {
 				refreshStats();
 				shopMenu.add(shopBuyAmmo);
 				shopMenu.add(shopBuy10Ammo);
+				/*
+				 * IIRC, the original game did not charge you pocket space for guns or bullets.
+				 * That's why they don't now. It might be interesting to see what the game would
+				 * look like if they DID take up space. It would definitely make the game harder,
+				 * but players might enjoy the challenge and/or realism. I don't know.
+				 */
 			}
 		});
 		shopBuyAmmo.addActionListener(new ActionListener() {
@@ -108,9 +116,26 @@ public class CrankWarsWindow extends Frame {
 				refreshStats();
 			}	
 		});
+		shopBuy10Space.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				int spaceCost = maxSpace * 2;
+				if (cash < spaceCost) {
+					tickerBox.append("You don't have that kind of money.\n");
+					return;
+				}
+				cash -= spaceCost;
+				maxSpace += 20;
+				space += 20;
+				tickerBox.append("You spend " + spaceCost + " bucks adding pockets, pouches, etc.\n");
+				shopBuy10Space.setLabel("Buy 20 Space ($" + (maxSpace * 2) + ")");
+				refreshStats();
+			}	
+		});
 		// Populate Menus
 		mainWindowMenu.add(shopMenu);
 		shopMenu.add(shopBuyGun);
+		shopMenu.add(shopBuy10Space);
 		setMenuBar(mainWindowMenu);
 		
 		
@@ -265,9 +290,8 @@ public class CrankWarsWindow extends Frame {
 					refreshSellPrices();
 				}
 				catch (Exception e) {
-					StackTraceElement l = e.getStackTrace()[0];
 					System.out.print("Exception raised while selling drugs: ");
-					System.out.println(l.getClassName()+"/"+l.getMethodName()+":"+l.getLineNumber());
+					e.printStackTrace(System.out);
 					tickerBox.append("Sell what? Stop smoking your own supply!\n");
 				}
 			}
@@ -331,7 +355,7 @@ public class CrankWarsWindow extends Frame {
 		
 		
 		
-		// TODO: Events, Officer Hardass, endgame/loan shark
+		// TODO: drug price events, Officer Hardass, endgame/loan shark, game balance
 	}
 	
 	// Main just fires off the Window and lets it do its thing
@@ -339,6 +363,9 @@ public class CrankWarsWindow extends Frame {
 		new CrankWarsWindow();
 	}
 	
+	/**
+	 * This method is called to update the stats pane at the top of the primary game window
+	 */
 	private void refreshStats() {
 		locationLabel.setText(locations[curLocation]);
 		dayLabel.setText(day + "");
@@ -353,6 +380,9 @@ public class CrankWarsWindow extends Frame {
 		healthLabel.setText(health + "%");
 	}
 	
+	/**
+	 * This method is called to generate new prices on arrival at a new location
+	 */
 	private void generateBuyPrices() {
 		buyPrices.removeAll();
 		for (int i = 0; i < drugs.length; i++) {
@@ -363,6 +393,11 @@ public class CrankWarsWindow extends Frame {
 		}
 	}
 	
+	/**
+	 * This method updates the prices pane without assigning new prices entirely
+	 * <p>
+	 * Its intended use case is when prices change due to user purchases/sales
+	 */
 	private void refreshBuyPrices() {
 		int selectedIndex = buyPrices.getSelectedIndex();
 		buyPrices.removeAll();
@@ -372,6 +407,9 @@ public class CrankWarsWindow extends Frame {
 		buyPrices.select(selectedIndex);
 	}
 	
+	/**
+	 * This method is called to update the price and amount of drugs shown in the righthand pane
+	 */
 	private void refreshSellPrices() {
 		int selectedIndex = sellPrices.getSelectedIndex();
 		sellPrices.removeAll();
@@ -382,9 +420,8 @@ public class CrankWarsWindow extends Frame {
 			}
 			catch (Exception e) {
 				// If you're here, it means you somehow have drugs and can't remember what you paid for them.
-				StackTraceElement l = e.getStackTrace()[0];
 				System.out.print("Drugs found without associated price: ");
-				System.out.println(l.getClassName()+"/"+l.getMethodName()+":"+l.getLineNumber());
+				e.printStackTrace(System.out);
 				sellPrice = 0;
 				pocketDrugPrices.put(drug, 0); // And don't let it happen again, mister!
 				tickerBox.append("You have " + drug + " but don't remember how much that cost.\n");
@@ -400,6 +437,9 @@ public class CrankWarsWindow extends Frame {
 		}
 	}
 	
+	/**
+	 * This method advances the current day and handles end-of-day updates/advances
+	 */
 	private void endOfDay() {
 		day++;
 		debt = (int)(debt * 1.1); // Will round down for floating points. He's a loan shark, but he's not Satan.
