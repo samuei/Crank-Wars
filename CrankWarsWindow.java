@@ -49,6 +49,8 @@ public class CrankWarsWindow extends Frame {
 	
 	// Primary Game Window
 	public CrankWarsWindow () {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/pill.png")));
+		
 		setLayout(new BorderLayout(3, 3));
 		
 		addWindowListener(new WindowAdapter() {

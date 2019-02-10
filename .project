@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>pill.png</name>
+			<type>1</type>
+			<location>C:/Users/maste/Documents/Github/Crank-Wars/Crank-Wars/pill.png</location>
+		</link>
+	</linkedResources>
 </projectDescription>
