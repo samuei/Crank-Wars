@@ -282,11 +282,16 @@ public class CrankWarsWindow extends Frame {
 					}
 					space++;
 					cash += price;
-					refreshStats();
-					
-					refreshBuyPrices();
 					tickerBox.append("Selling " + drugName + " for $" + price + "\n");
-					drugLocalPrices.put(drugName, price - 2);
+					if (price > 2) {
+						drugLocalPrices.put(drugName, price - 2);
+					}
+					else {
+						drugLocalPrices.put(drugName, 1);
+					}
+					
+					refreshStats();
+					refreshBuyPrices();
 					refreshSellPrices();
 				}
 				catch (Exception e) {
