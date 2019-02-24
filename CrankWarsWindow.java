@@ -49,6 +49,7 @@ public class CrankWarsWindow extends Frame {
 	
 	// Primary Game Window
 	public CrankWarsWindow () {
+		// Pill icon:
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/pill.png")));
 		
 		setLayout(new BorderLayout(3, 3));
@@ -157,34 +158,7 @@ public class CrankWarsWindow extends Frame {
 		
 		// Stats
 		// To update, use refreshStats()
-		Panel statsPanel = new Panel(new GridLayout(0, 6));
-		statsPanel.add(new Label("Location:"));
-		locationLabel = new Label(locations[curLocation]);
-		statsPanel.add(locationLabel);
-		statsPanel.add(new Label("Day:"));
-		dayLabel = new Label(day + "");
-		statsPanel.add(dayLabel);
-		statsPanel.add(new Label("Space:"));
-		spaceLabel = new Label(space + " of " + maxSpace);
-		statsPanel.add(spaceLabel);
-		statsPanel.add(new Label("Cash:"));
-		cashLabel = new Label("$" + cash);
-		statsPanel.add(cashLabel);
-		statsPanel.add(new Label("Debt:"));
-		debtLabel = new Label("$" + debt);
-		statsPanel.add(debtLabel);
-		statsPanel.add(new Label("Bank:"));
-		bankLabel = new Label("$" + bank);
-		statsPanel.add(bankLabel);
-		ammoLegendLabel = new Label("Ammo:");
-		statsPanel.add(ammoLegendLabel);
-		ammoLabel = new Label(ammo + "");
-		statsPanel.add(ammoLabel);
-		ammoLabel.setVisible(false);
-		ammoLegendLabel.setVisible(false);
-		statsPanel.add(new Label("Health:"));
-		healthLabel = new Label(health + "%");
-		statsPanel.add(healthLabel);
+		Panel statsPanel = createStatsPanel();
 		add(statsPanel, BorderLayout.NORTH);
 		
 		// News Ticker
@@ -452,6 +426,44 @@ public class CrankWarsWindow extends Frame {
 		debt = (int)(debt * 1.1); // Will round down for floating points. He's a loan shark, but he's not Satan.
 		refreshStats();
 		generateBuyPrices();
+	}
+	
+	/**
+	 * This method creates the stats panel at the top of the CrankWarsWindow
+	 * <p>
+	 * Update that window using refreshstats.
+	 */
+	private Panel createStatsPanel() {
+		Panel statsPanel = new Panel(new GridLayout(0, 6));
+		statsPanel.add(new Label("Location:"));
+		locationLabel = new Label(locations[curLocation]);
+		statsPanel.add(locationLabel);
+		statsPanel.add(new Label("Day:"));
+		dayLabel = new Label(day + "");
+		statsPanel.add(dayLabel);
+		statsPanel.add(new Label("Space:"));
+		spaceLabel = new Label(space + " of " + maxSpace);
+		statsPanel.add(spaceLabel);
+		statsPanel.add(new Label("Cash:"));
+		cashLabel = new Label("$" + cash);
+		statsPanel.add(cashLabel);
+		statsPanel.add(new Label("Debt:"));
+		debtLabel = new Label("$" + debt);
+		statsPanel.add(debtLabel);
+		statsPanel.add(new Label("Bank:"));
+		bankLabel = new Label("$" + bank);
+		statsPanel.add(bankLabel);
+		ammoLegendLabel = new Label("Ammo:");
+		statsPanel.add(ammoLegendLabel);
+		ammoLabel = new Label(ammo + "");
+		statsPanel.add(ammoLabel);
+		ammoLabel.setVisible(false);
+		ammoLegendLabel.setVisible(false);
+		statsPanel.add(new Label("Health:"));
+		healthLabel = new Label(health + "%");
+		statsPanel.add(healthLabel);
+		
+		return statsPanel;
 	}
 
 }
