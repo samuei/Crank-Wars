@@ -247,6 +247,12 @@ public class CrankWarsWindow extends Frame {
 				try { // You know, in case the user doesn't select something first
 					String[] split = desiredPurchase.split("\\: "); // drug: amt @ $price
 					String drugName = split[0]; // Throw the rest away. This is the key.
+					
+					if (!drugLocalPrices.containsKey(drugName)) {
+						tickerBox.append("Nobody's buying that here.\n");
+						return;
+					}
+					
 					int price = drugLocalPrices.get(drugName);
 					int amountHeld = drugsInPocket.get(drugName) - 1;
 					if (amountHeld == 0) {
@@ -366,7 +372,14 @@ public class CrankWarsWindow extends Frame {
 	 */
 	private void generateBuyPrices() {
 		buyPrices.removeAll();
+		drugLocalPrices.clear();
 		for (int i = 0; i < drugs.length; i++) {
+			// Should this drug be available at this location today?
+			if (Math.random() < 0.2) { // ~ 4/5 chance of drug being at any given location
+				continue;
+			}
+			
+			// If so, how much should it cost?
 			double priceFactor = Math.random() * 1.8 + 0.2;
 			int finalPrice = (int)(drugBasePrices.get(drugs[i]) * priceFactor);
 			drugLocalPrices.put(drugs[i], finalPrice);
@@ -383,7 +396,9 @@ public class CrankWarsWindow extends Frame {
 		int selectedIndex = buyPrices.getSelectedIndex();
 		buyPrices.removeAll();
 		for (int i = 0; i < drugs.length; i++) {
-			buyPrices.add(drugs[i] + ": $" + drugLocalPrices.get(drugs[i]));
+			if (drugLocalPrices.containsKey(drugs[i])) {
+				buyPrices.add(drugs[i] + ": $" + drugLocalPrices.get(drugs[i]));
+			}
 		}
 		buyPrices.select(selectedIndex);
 	}
