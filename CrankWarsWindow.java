@@ -491,12 +491,43 @@ public class CrankWarsWindow extends Frame {
 	 */
 	private double getPriceFactor(String drugName) {
 		double eventSeed = Math.random();
+		int whichEvent = new java.util.Random().nextInt(3);
 		if (eventSeed < 0.05) {
-			tickerBox.append("An influx of cheap " + drugName + " is driving down prices! \n");
+			switch (whichEvent) { // Why's the price this way?
+				case 0:
+					tickerBox.append("An influx of cheap " + drugName + " is driving down prices! \n");
+					break;
+				case 1:
+					tickerBox.append("Rival dealers flood the " + drugName + " market! Prices are low! \n");
+					break;
+				case 2:
+					tickerBox.append("Prices low after a huge shipment of " + drugName + " slipped past authorities! \n");
+					break;
+				default: // Something is screwy, but we still need event text
+					tickerBox.append(drugName + ". " + drugName + " everywhere. \n");
+					break;
+			}
+			
+			// And the change in price is what?
 			return Math.random() + eventSeed;
 		}
 		else if (eventSeed < 0.1) {
-			tickerBox.append("Cops bust local " + drugName + " dealers! Prices are insane! \n");
+			switch (whichEvent) { // Why's the price this way?
+				case 0:
+					tickerBox.append("Cops bust local " + drugName + " dealers! Prices are insane! \n");
+					break;
+				case 1:
+					tickerBox.append("Addicts are buying " + drugName + " at ridiculous prices! \n");
+					break;
+				case 2:
+					tickerBox.append("Everybody's itching for  " + drugName + "! Prices are higher than the junkies! \n");
+					break;
+				default: // Something is screwy, but we still need event text
+					tickerBox.append("Seems like nobody's got any " + drugName + ". People would pay top dollar for it. \n");
+					break;
+			}
+			
+			// And the change in price is what?
 			return 2 + eventSeed;
 		}
 		else if (drugName == "Weed" && eventSeed < 0.15) {
