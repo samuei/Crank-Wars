@@ -127,13 +127,13 @@ public class CrankWarsWindow extends Frame {
 			public void actionPerformed(ActionEvent evt) {
 				int spaceCost = maxSpace * 2;
 				if (cash < spaceCost) {
-					tickerBox.append("You don't have that kind of money.\n");
+					tickerBox.append("You don't have that kind of money. \n");
 					return;
 				}
 				cash -= spaceCost;
 				maxSpace += 20;
 				space += 20;
-				tickerBox.append("You spend " + spaceCost + " bucks adding pockets, pouches, etc.\n");
+				tickerBox.append("You spend " + spaceCost + " bucks adding pockets, pouches, etc. \n");
 				shopBuy10Space.setLabel("Buy 20 Space ($" + (maxSpace * 2) + ")");
 				refreshStats();
 			}	
