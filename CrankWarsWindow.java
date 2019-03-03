@@ -277,8 +277,9 @@ public class CrankWarsWindow extends Frame {
 					refreshSellPrices();
 				}
 				catch (Exception e) {
+					StackTraceElement l = e.getStackTrace()[0];
 					System.out.print("Exception raised while selling drugs: ");
-					e.printStackTrace(System.out);
+					System.out.println(l.getClassName()+"/"+l.getMethodName()+":"+l.getLineNumber());
 					tickerBox.append("Sell what? Stop smoking your own supply!\n");
 				}
 			}
