@@ -385,6 +385,10 @@ public class CrankWarsWindow extends Frame {
 			drugLocalPrices.put(drugs[i], finalPrice);
 			buyPrices.add(drugs[i] + ": $" + finalPrice);
 		}
+		
+		if (buyPrices.getItemCount() == 0) { // No drugs available!
+			tickerBox.append("Cops are out in force today. Dealers and customers alike are laying low.");
+		}
 	}
 	
 	/**
