@@ -342,7 +342,7 @@ public class CrankWarsWindow extends Frame {
 		
 		
 		
-		// TODO: drug price events, Officer Hardass, endgame/loan shark, game balance
+		// TODO: Officer Hardass, endgame/loan shark, game balance
 	}
 	
 	// Main just fires off the Window and lets it do its thing
@@ -380,7 +380,7 @@ public class CrankWarsWindow extends Frame {
 			}
 			
 			// If so, how much should it cost?
-			double priceFactor = Math.random() * 1.8 + 0.2;
+			double priceFactor = getPriceFactor(drugs[i]);
 			int finalPrice = (int)(drugBasePrices.get(drugs[i]) * priceFactor);
 			drugLocalPrices.put(drugs[i], finalPrice);
 			buyPrices.add(drugs[i] + ": $" + finalPrice);
@@ -481,4 +481,26 @@ public class CrankWarsWindow extends Frame {
 		return statsPanel;
 	}
 
+	/**
+	 * This method creates a price factor for a given drug, and activates special events
+	 * at pseudorandom intervals
+	 */
+	private double getPriceFactor(String drugName) {
+		double eventSeed = Math.random();
+		if (eventSeed < 0.05) {
+			tickerBox.append("An influx of cheap " + drugName + " is driving down prices! \n");
+			return Math.random() + eventSeed;
+		}
+		else if (eventSeed < 0.1) {
+			tickerBox.append("Cops bust local " + drugName + " dealers! Prices are insane! \n");
+			return 2 + eventSeed;
+		}
+		else if (drugName == "Weed" && eventSeed < 0.15) {
+			tickerBox.append("The Marrakesh Express has arrived! \n");
+			return 0.15;
+		}
+		
+		// No events for this drug today:
+		return (Math.random() * 1.8) + 0.5;
+	}
 }
