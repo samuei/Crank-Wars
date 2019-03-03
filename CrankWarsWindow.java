@@ -44,8 +44,8 @@ public class CrankWarsWindow extends Frame {
 	List sellPrices, buyPrices;
 	Dialog jetDialog;
 	MenuBar mainWindowMenu;
-	Menu shopMenu;
-	MenuItem shopBuyGun, shopBuyAmmo, shopBuy10Ammo, shopBuy10Space;
+	Menu shopMenu, loanMenu;
+	MenuItem shopBuyGun, shopBuyAmmo, shopBuy10Ammo, shopBuy10Space, loanPayBack, loanTake;
 	
 	// Primary Game Window
 	public CrankWarsWindow () {
@@ -70,6 +70,9 @@ public class CrankWarsWindow extends Frame {
 		shopBuyAmmo = new MenuItem("Buy Ammo ($10)");
 		shopBuy10Ammo = new MenuItem("Buy 10 Ammo ($100)");
 		shopBuy10Space = new MenuItem("Buy 20 Space ($40)");
+		loanMenu = new Menu("Loan");
+		loanPayBack = new MenuItem("Pay Back Loan");
+		loanTake = new MenuItem("Take Out New Loan");
 		// Make Menu listeners
 		shopBuyGun.addActionListener(new ActionListener() {
 			@Override
@@ -135,10 +138,38 @@ public class CrankWarsWindow extends Frame {
 				refreshStats();
 			}	
 		});
+		loanPayBack.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if (cash > debt) {
+					tickerBox.append("With a look of surprise, the loan shark takes your money. \n");
+					cash = cash - debt;
+					debt = 0;
+					tickerBox.append("    \"Pleasure doing business with you.\" \n");
+					refreshStats();
+				}
+				else {
+					tickerBox.append("When it becomes obvious you don't have the money, \n  he has a very large thug throw you out. \n");
+				}
+			}
+		});
+		loanTake.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				tickerBox.append("The Shark hands over another grand and makes a mark in his ledger. \n");
+				cash += 1000;
+				debt += 1000;
+				tickerBox.append("    \"Tick, tock.\" \n");
+				refreshStats();
+			}
+		});
 		// Populate Menus
 		mainWindowMenu.add(shopMenu);
+		mainWindowMenu.add(loanMenu);
 		shopMenu.add(shopBuyGun);
 		shopMenu.add(shopBuy10Space);
+		loanMenu.add(loanPayBack);
+		loanMenu.add(loanTake);
 		setMenuBar(mainWindowMenu);
 		
 		
@@ -313,6 +344,7 @@ public class CrankWarsWindow extends Frame {
 												};
 						String howYouTraveled = modeOfTravel[((int)(Math.random() * modeOfTravel.length))];
 						tickerBox.append("You" + howYouTraveled + backOrForth + " to " + locations[i] + "\n");
+						menuButtonRevise();
 						break;
 					}
 				}
@@ -539,4 +571,20 @@ public class CrankWarsWindow extends Frame {
 		// No events for this drug today:
 		return (Math.random() * 1.8) + 0.5;
 	}
+	
+	/**
+	 * This method revises available menu options when you travel
+	 */
+	 private void menuButtonRevise() {
+		 // Handle loan shark menu
+		 mainWindowMenu.remove(loanMenu);
+		 loanMenu.removeAll();
+		 if (curLocation == 0 && day < 21) { // Shark's office is in Manhattan
+			 mainWindowMenu.add(loanMenu);
+			 if (debt > 0) { // Can't pay back loans you don't have!
+				loanMenu.add(loanPayBack);
+			 }
+			 loanMenu.add(loanTake);
+		 }
+	 }
 }
