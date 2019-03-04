@@ -190,6 +190,7 @@ public class CrankWarsWindow extends Frame {
 					dailyHeals = dailyHeals - 1; // Limited heals per day
 					health = (health + 10 >= 100) ? 100 : health + 10; // Max out at 100 health
 					tickerBox.append("An EMT takes a C-note to give you some no-questions-asked attention. \n");
+					refreshStats();
 				}
 			}
 		});
