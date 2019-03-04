@@ -45,8 +45,9 @@ public class CrankWarsWindow extends Frame {
 	List sellPrices, buyPrices;
 	Dialog jetDialog;
 	MenuBar mainWindowMenu;
-	Menu shopMenu, loanMenu, hospitalMenu;
-	MenuItem shopBuyGun, shopBuyAmmo, shopBuy10Ammo, shopBuy10Space, loanPayBack, loanTake, hospitalPartialHeal, hospitalFullHeal;
+	Menu shopMenu, loanMenu, hospitalMenu, bankMenu;
+	MenuItem shopBuyGun, shopBuyAmmo, shopBuy10Ammo, shopBuy10Space, loanPayBack, loanTake, 
+		hospitalPartialHeal, hospitalFullHeal, bankDeposit, bankWithdraw;
 	
 	// Primary Game Window
 	public CrankWarsWindow () {
@@ -77,6 +78,9 @@ public class CrankWarsWindow extends Frame {
 		hospitalMenu = new Menu("Hospital");
 		hospitalPartialHeal = new MenuItem("Get Minor Treatment ($100)");
 		hospitalFullHeal = new MenuItem("Check Yourself In ($1500)");
+		bankMenu = new Menu("Bank");
+		bankDeposit = new MenuItem("Make a Deposit");
+		bankWithdraw = new MenuItem("Make a Withdrawal");
 		// Make Menu listeners
 		shopBuyGun.addActionListener(new ActionListener() {
 			@Override
@@ -207,6 +211,48 @@ public class CrankWarsWindow extends Frame {
 				}
 			}
 		});
+		bankDeposit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if (bank == 0 && cash >= 1000) { // New customer
+					tickerBox.append("You find a bank that will take your money and open an account. \n");
+					cash -= 1000;
+					bank += 1000;
+					tickerBox.append("    \"You don't ask if we're licensed and we don't ask where you got that money.\" \n");
+				}
+				else if (cash >= 1000) { // Return customer
+					tickerBox.append("The guy behind the counter takes your money with a wink. \n");
+					cash -= 1000;
+					bank += 1000;
+				}
+				else { // Deadbeat
+					tickerBox.append("This bank only takes deposits in thousand-dollar increments. \n");
+				}
+				
+				refreshStats();
+			}
+		});
+		bankWithdraw.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if (bank == 0) { // Deadbeat
+					tickerBox.append("The clerk does not think you're very funny. \n");
+				}
+				else if (bank == 1000) { // Down on your luck
+					tickerBox.append("You take your last grand out of the bank. \n");
+					cash += 1000;
+					bank = 0;
+					tickerBox.append("    \"Tough times, huh?\" \n");
+				}
+				else { // Another satisfied customer
+					tickerBox.append("You withdraw $1000. Some of the bills are moist, but the money's all there. \n");
+					cash += 1000;
+					bank -= 1000;
+				}
+				
+				refreshStats();
+			}
+		});
 		// Populate Menus
 		mainWindowMenu.add(shopMenu);
 		mainWindowMenu.add(loanMenu);
@@ -216,6 +262,8 @@ public class CrankWarsWindow extends Frame {
 		loanMenu.add(loanTake);
 		hospitalMenu.add(hospitalPartialHeal);
 		hospitalMenu.add(hospitalFullHeal);
+		bankMenu.add(bankDeposit);
+		bankMenu.add(bankWithdraw);
 		setMenuBar(mainWindowMenu);
 		
 		
@@ -626,6 +674,7 @@ public class CrankWarsWindow extends Frame {
 		 // Handle loan shark menu
 		 mainWindowMenu.remove(loanMenu);
 		 mainWindowMenu.remove(hospitalMenu);
+		 mainWindowMenu.remove(bankMenu);
 		 loanMenu.removeAll();
 		 if (curLocation == 0 && day < 21) { // Shark's office is in Manhattan
 			 mainWindowMenu.add(loanMenu);
@@ -636,6 +685,9 @@ public class CrankWarsWindow extends Frame {
 		 }
 		 else if (curLocation == 1 || curLocation == 4) { // There are two hospitals, because reasons
 			 mainWindowMenu.add(hospitalMenu);
+		 }
+		 else if (curLocation == 2) { // The kind of bank that serves your demographic doesn't have ATMs
+			 mainWindowMenu.add(bankMenu);
 		 }
 	 }
 }
