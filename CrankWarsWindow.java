@@ -64,8 +64,6 @@ public class CrankWarsWindow extends Frame {
 		});
 		
 		// Make Menus
-		// TODO: "cheat menu" so I can more easily test things like paying back loans
-		// TODO: Hospital for healing
 		mainWindowMenu = new MenuBar();
 		shopMenu = new Menu("Shop");
 		shopBuyGun = new MenuItem("Buy Gun ($100)");
