@@ -13,6 +13,7 @@ public class CrankWarsWindow extends Frame {
 	private int ammo = 0;
 	private int health = 100;
 	private int day = 1;
+	private int dailyHeals = 3;
 	private String[] locations = {
 		"Manhattan", 
 		"Brooklyn", 
@@ -44,8 +45,8 @@ public class CrankWarsWindow extends Frame {
 	List sellPrices, buyPrices;
 	Dialog jetDialog;
 	MenuBar mainWindowMenu;
-	Menu shopMenu, loanMenu;
-	MenuItem shopBuyGun, shopBuyAmmo, shopBuy10Ammo, shopBuy10Space, loanPayBack, loanTake;
+	Menu shopMenu, loanMenu, hospitalMenu;
+	MenuItem shopBuyGun, shopBuyAmmo, shopBuy10Ammo, shopBuy10Space, loanPayBack, loanTake, hospitalPartialHeal, hospitalFullHeal;
 	
 	// Primary Game Window
 	public CrankWarsWindow () {
@@ -73,6 +74,9 @@ public class CrankWarsWindow extends Frame {
 		loanMenu = new Menu("Loan");
 		loanPayBack = new MenuItem("Pay Back Loan");
 		loanTake = new MenuItem("Take Out New Loan");
+		hospitalMenu = new Menu("Hospital");
+		hospitalPartialHeal = new MenuItem("Get Minor Treatment ($100)");
+		hospitalFullHeal = new MenuItem("Check Yourself In ($1500)");
 		// Make Menu listeners
 		shopBuyGun.addActionListener(new ActionListener() {
 			@Override
@@ -163,6 +167,46 @@ public class CrankWarsWindow extends Frame {
 				refreshStats();
 			}
 		});
+		hospitalPartialHeal.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if (health == 100) {
+					tickerBox.append("You're hale and hearty! \n");
+				}
+				else if (cash < 100) { // Heartless!
+					tickerBox.append("The ER receptionist takes one look at you and has security throw you out. \n");
+					tickerBox.append("    \"This ain't no free clinic.\" \n");
+				}
+				else if (dailyHeals <= 0) {
+					tickerBox.append("You've been in too much; the staff recognize you from earlier today. \n");
+					tickerBox.append("    \"Listen, man. You either check yourself in or you walk.\" \n");
+				}
+				else {
+					cash = cash - 100;
+					dailyHeals = dailyHeals - 1; // Limited heals per day
+					health = (health + 10 >= 100) ? 100 : health + 10; // Max out at 100 health
+					tickerBox.append("An EMT takes a C-note to give you some no-questions-asked attention. \n");
+				}
+			}
+		});
+		hospitalFullHeal.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				if (health == 100) {
+					tickerBox.append("You're hale and hearty! \n");
+				}
+				else if (cash < 1500) { // This is America
+					tickerBox.append("The orderly tries to make you bounce as he throws you out the door. \n");
+					tickerBox.append("    \"No insurance, no cash, no treatment.\" \n");
+				}
+				else {
+					cash = cash - 1500;
+					health = 100;
+					tickerBox.append("You manage to convince the doctors not to report anything. You pay with cash. \n");
+					endOfDay();
+				}
+			}
+		});
 		// Populate Menus
 		mainWindowMenu.add(shopMenu);
 		mainWindowMenu.add(loanMenu);
@@ -170,6 +214,8 @@ public class CrankWarsWindow extends Frame {
 		shopMenu.add(shopBuy10Space);
 		loanMenu.add(loanPayBack);
 		loanMenu.add(loanTake);
+		hospitalMenu.add(hospitalPartialHeal);
+		hospitalMenu.add(hospitalFullHeal);
 		setMenuBar(mainWindowMenu);
 		
 		
@@ -476,6 +522,7 @@ public class CrankWarsWindow extends Frame {
 	private void endOfDay() {
 		day++;
 		debt = (int)(debt * 1.1); // Will round down for floating points. He's a loan shark, but he's not Satan.
+		dailyHeals = 3; // These refresh every day, as the name implies
 		refreshStats();
 		generateBuyPrices();
 	}
@@ -578,6 +625,7 @@ public class CrankWarsWindow extends Frame {
 	 private void menuButtonRevise() {
 		 // Handle loan shark menu
 		 mainWindowMenu.remove(loanMenu);
+		 mainWindowMenu.remove(hospitalMenu);
 		 loanMenu.removeAll();
 		 if (curLocation == 0 && day < 21) { // Shark's office is in Manhattan
 			 mainWindowMenu.add(loanMenu);
@@ -585,6 +633,9 @@ public class CrankWarsWindow extends Frame {
 				loanMenu.add(loanPayBack);
 			 }
 			 loanMenu.add(loanTake);
+		 }
+		 else if (curLocation == 1 || curLocation == 4) { // There are two hospitals, because reasons
+			 mainWindowMenu.add(hospitalMenu);
 		 }
 	 }
 }
