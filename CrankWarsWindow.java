@@ -468,7 +468,7 @@ public class CrankWarsWindow extends Frame {
 		
 		
 		
-		// TODO: Officer Hardass, endgame/loan shark, game balance
+		// TODO: Officer Hardass, game balance
 	}
 	
 	// Main just fires off the Window and lets it do its thing
@@ -508,6 +508,9 @@ public class CrankWarsWindow extends Frame {
 			// If so, how much should it cost?
 			double priceFactor = getPriceFactor(drugs[i]);
 			int finalPrice = (int)(drugBasePrices.get(drugs[i]) * priceFactor);
+			if (finalPrice <= 0) { // No such thing as free drugs, kids.
+				finalPrice = 1;
+			}
 			drugLocalPrices.put(drugs[i], finalPrice);
 			buyPrices.add(drugs[i] + ": $" + finalPrice);
 		}
@@ -572,6 +575,67 @@ public class CrankWarsWindow extends Frame {
 		dailyHeals = 3; // These refresh every day, as the name implies
 		refreshStats();
 		generateBuyPrices();
+		if (day == 31) {
+			endOfGame();
+		}
+	}
+	
+	/**
+	 * This ends the game.
+	 */
+	private void endOfGame() {
+		Dialog endGameDialog = new Dialog(this, "Game Over!", true);
+		endGameDialog.setLayout(new BorderLayout(3, 3));
+		endGameDialog.setSize(300, 300);
+		endGameDialog.setLocationRelativeTo(null);
+		
+		TextArea endGameText = new TextArea("", 10, 20, TextArea.SCROLLBARS_VERTICAL_ONLY);
+		endGameText.setEditable(false);
+		
+		if (debt > 0) { // Time to pay up
+			endGameText.append("On the morning of the 31st day, the Shark and his goons burst into your apartment. ");
+			endGameText.append("After viciously beating you, they proceed to tear your place apart for your money. ");
+			if (cash > debt) {
+				cash = cash - debt;
+				if (cash > 200) {
+					cash = cash - 200;
+					endGameText.append("They also take an extra $200 as a \"collection charge.\" ");
+				}
+				else {
+					cash = 0;
+					endGameText.append("They also take an the rest of your cash as a \"collection charge.\" ");
+				}
+				endGameText.append("One of the goons spits in your face as he leaves. \n \n");
+				endGameText.append("YOU SURVIVED! \n");
+			}
+			else { // Oh, Paulie...won't see him no more.
+				cash = 0;
+				endGameText.append("When they don't find enough to pay your debt, the Shark sighs and motions toward the door. ");
+				endGameText.append("The goons knock you out, and everything goes black. \n \n");
+				endGameText.append("YOU DIED! \n");
+			}
+			
+			debt = 0; // One way or another, you don't owe him any money, now.
+		}
+		else { // Very forward-thinking of you!
+			endGameText.append("You paid off the Shark before your loan came due. Smart. \n \n");
+			endGameText.append("YOU SURVIVED! \n");
+		}
+		
+		endGameText.append("You earned " + ((cash + bank) * 2) + " points!");
+		
+		endGameDialog.add(endGameText, BorderLayout.NORTH);
+		
+		Button endGameOkButton = new Button("Thanks for Playing!");
+		endGameOkButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				System.exit(0);  // Terminate the program
+			}
+		});
+		endGameDialog.add(endGameOkButton, BorderLayout.SOUTH);
+		
+		endGameDialog.setVisible(true);
 	}
 	
 	/**
