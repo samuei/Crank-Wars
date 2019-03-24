@@ -465,10 +465,6 @@ public class CrankWarsWindow extends Frame {
 		setSize(500, 700);
 		setLocationRelativeTo(null);
 		setVisible(true);
-		
-		
-		
-		// TODO: Officer Hardass, game balance
 	}
 	
 	// Main just fires off the Window and lets it do its thing
@@ -586,6 +582,9 @@ public class CrankWarsWindow extends Frame {
 			else if (eventSeed < 0.02) {
 				tickerBox.append("A street preacher informs everyone that they are doomed. \n");
 			}
+			else if (eventSeed < 1) { // TODO: Change this to a reasonable value once testing is finished
+				combatWindow("Officer Hardass", 100, 10);
+			}
 		}
 	}
 	
@@ -645,6 +644,32 @@ public class CrankWarsWindow extends Frame {
 		endGameDialog.add(endGameOkButton, BorderLayout.SOUTH);
 		
 		endGameDialog.setVisible(true);
+	}
+	
+	// TODO: attack, surrender, run, stats.
+	private void combatWindow(String attacker, int attackerHP, int attackerBaseDamage) {
+		Dialog combatDialog = new Dialog(this, "Combat!", true);
+		combatDialog.setLayout(new BorderLayout(3, 3));
+		combatDialog.setSize(300, 300);
+		combatDialog.setLocationRelativeTo(null);
+		
+		TextArea combatText = new TextArea("", 5, 20, TextArea.SCROLLBARS_VERTICAL_ONLY);
+		combatText.setEditable(false);
+		combatDialog.add(combatText, BorderLayout.NORTH);
+		
+		combatText.append("You are detained by " + attacker + "! \n");
+		
+		Button exitCombatButton = new Button("Exit Combat");
+		exitCombatButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				refreshStats();
+				combatDialog.setVisible(false);
+			}
+		});
+		combatDialog.add(exitCombatButton, BorderLayout.SOUTH);
+		
+		combatDialog.setVisible(true);
 	}
 	
 	/**
