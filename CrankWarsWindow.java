@@ -578,6 +578,15 @@ public class CrankWarsWindow extends Frame {
 		if (day == 31) {
 			endOfGame();
 		}
+		else { // Possibly include random flavor event
+			double eventSeed = Math.random();
+			if (eventSeed < 0.01) {
+				tickerBox.append("An old lady asks, \"Would you like a jelly baby?\" \n");
+			}
+			else if (eventSeed < 0.02) {
+				tickerBox.append("A street preacher informs everyone that they are doomed. \n");
+			}
+		}
 	}
 	
 	/**
@@ -624,7 +633,7 @@ public class CrankWarsWindow extends Frame {
 		
 		endGameText.append("You earned " + ((cash + bank) * 2) + " points!");
 		
-		endGameDialog.add(endGameText, BorderLayout.NORTH);
+		endGameDialog.add(endGameText, BorderLayout.CENTER);
 		
 		Button endGameOkButton = new Button("Thanks for Playing!");
 		endGameOkButton.addActionListener(new ActionListener() {
