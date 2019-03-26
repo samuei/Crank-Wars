@@ -206,7 +206,7 @@ public class CrankWarsWindow extends Frame {
 					cash = cash - 1500;
 					health = 100;
 					tickerBox.append("You manage to convince the doctors not to report anything. You pay with cash. \n");
-					endOfDay();
+					endOfDay(false);
 				}
 			}
 		});
@@ -441,7 +441,7 @@ public class CrankWarsWindow extends Frame {
 						break;
 					}
 				}
-				endOfDay();
+				endOfDay(false);
 			}
 		});
 		jetDialog.add(jetChoices);
@@ -565,7 +565,7 @@ public class CrankWarsWindow extends Frame {
 	/**
 	 * This method advances the current day and handles end-of-day updates/advances
 	 */
-	private void endOfDay() {
+	private void endOfDay(boolean uneventfulDay) {
 		day++;
 		debt = (int)(debt * 1.1); // Will round down for floating points. He's a loan shark, but he's not Satan.
 		dailyHeals = 3; // These refresh every day, as the name implies
@@ -574,7 +574,7 @@ public class CrankWarsWindow extends Frame {
 		if (day == 31) {
 			endOfGame();
 		}
-		else { // Possibly include random flavor event
+		else if (!uneventfulDay) { // Possibly include random flavor event
 			double eventSeed = Math.random();
 			if (eventSeed < 0.01) {
 				tickerBox.append("An old lady asks, \"Would you like a jelly baby?\" \n");
@@ -646,7 +646,7 @@ public class CrankWarsWindow extends Frame {
 		endGameDialog.setVisible(true);
 	}
 	
-	// TODO: attack, surrender, run, stats.
+	// TODO: attack, run, stats.
 	private void combatWindow(String attacker, int attackerHP, int attackerBaseDamage) {
 		Dialog combatDialog = new Dialog(this, "Combat!", true);
 		combatDialog.setLayout(new BorderLayout(3, 3));
@@ -659,6 +659,39 @@ public class CrankWarsWindow extends Frame {
 		
 		combatText.append("You are detained by " + attacker + "! \n");
 		
+		Panel combatButtonsPanel = new Panel(new GridLayout(4, 1));
+		
+		Button surrenderCombatButton = new Button("Surrender");
+		surrenderCombatButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				tickerBox.append("You surrender. \n"); 
+				if (space < maxSpace) { // You're carrying
+					tickerBox.append(attacker + " confiscate all your drugs. \n");
+					space = maxSpace;
+					drugsInPocket.clear();
+					pocketDrugPrices.clear();
+					sellPrices.removeAll();
+					tickerBox.append("They also confiscate your cash. \n");
+					cash = 0;
+					tickerBox.append("After 3 days, a bailiff throws you out to free up a cell. \n");
+					 // In case I want to change how long you're held
+					for(int i = 0; i < 2; i++) { // First day is today, so just 2 more
+						endOfDay(true);
+					}
+					refreshStats();
+					combatDialog.setVisible(false);
+				} 
+				else { // I'm letting you off easy this time...
+					tickerBox.append("The cops don't find any drugs on you. \n");
+					tickerBox.append("    \"I'm watching you, punk.\" \n");
+					refreshStats();
+					combatDialog.setVisible(false);
+				}
+			}
+		});
+		combatButtonsPanel.add(surrenderCombatButton);
+		
 		Button exitCombatButton = new Button("Exit Combat");
 		exitCombatButton.addActionListener(new ActionListener() {
 			@Override
@@ -667,8 +700,9 @@ public class CrankWarsWindow extends Frame {
 				combatDialog.setVisible(false);
 			}
 		});
-		combatDialog.add(exitCombatButton, BorderLayout.SOUTH);
+		combatButtonsPanel.add(exitCombatButton);
 		
+		combatDialog.add(combatButtonsPanel, BorderLayout.SOUTH);
 		combatDialog.setVisible(true);
 	}
 	
