@@ -649,7 +649,7 @@ public class CrankWarsWindow extends Frame {
 		endGameDialog.setVisible(true);
 	}
 	
-	// TODO: attack, run, stats.
+	// TODO: attack, stats.
 	private void combatWindow(String attacker, int attackerHP, int attackerBaseDamage) {
 		Dialog combatDialog = new Dialog(this, "Combat!", true);
 		combatDialog.setLayout(new BorderLayout(3, 3));
@@ -670,7 +670,7 @@ public class CrankWarsWindow extends Frame {
 			public void actionPerformed(ActionEvent evt) {
 				tickerBox.append("You surrender. \n"); 
 				if (space < maxSpace) { // You're carrying
-					tickerBox.append(attacker + " confiscate all your drugs. \n");
+					tickerBox.append(attacker + " confiscates all your drugs. \n");
 					space = maxSpace;
 					drugsInPocket.clear();
 					pocketDrugPrices.clear();
@@ -682,18 +682,49 @@ public class CrankWarsWindow extends Frame {
 					for(int i = 0; i < 2; i++) { // First day is today, so just 2 more
 						endOfDay(true);
 					}
-					refreshStats();
-					combatDialog.setVisible(false);
 				} 
 				else { // I'm letting you off easy this time...
 					tickerBox.append("The cops don't find any drugs on you. \n");
 					tickerBox.append("    \"I'm watching you, punk.\" \n");
-					refreshStats();
-					combatDialog.setVisible(false);
 				}
+				
+				refreshStats();
+				combatDialog.setVisible(false);
 			}
 		});
 		combatButtonsPanel.add(surrenderCombatButton);
+		
+		Button runCombatButton = new Button("Run For It");
+		runCombatButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				combatText.append("You make a break for it! \n");
+				double retreatSeed = Math.random();
+				if (retreatSeed < 0.7) { // Escape!
+					tickerBox.append("You manage to get away. \n");
+					combatDialog.setVisible(false);
+				}
+				else { // Nope!
+					// TODO: Abstract attack/defend away to prevent repeated code
+					combatText.append("They're still hot on your tail! \n");
+					combatText.append(attacker + " takes a shot! \n");
+					double attackerHitSeed = Math.random();
+					if (attackerHitSeed < 0.4 ) { // Attacker's not a crack shot
+						combatText.append("The shot goes wide! \n");
+					}
+					else { // A hit! A very palpable hit!
+						int damage = (int)(attackerBaseDamage * (Math.random() * 2));
+						combatText.append("You are shot for " + damage + " HP! \n");
+						health = health - damage;
+						if (health <= 0) { // OH NOES!
+							health = 0;
+							endOfGame();
+						}
+					}
+				}
+			}
+		});
+		combatButtonsPanel.add(runCombatButton);
 		
 		Button exitCombatButton = new Button("Exit Combat");
 		exitCombatButton.addActionListener(new ActionListener() {
