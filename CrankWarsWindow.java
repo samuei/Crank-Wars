@@ -600,35 +600,38 @@ public class CrankWarsWindow extends Frame {
 		TextArea endGameText = new TextArea("", 10, 20, TextArea.SCROLLBARS_VERTICAL_ONLY);
 		endGameText.setEditable(false);
 		
-		if (debt > 0) { // Time to pay up
-			endGameText.append("On the morning of the 31st day, the Shark and his goons burst into your apartment. ");
-			endGameText.append("After viciously beating you, they proceed to tear your place apart for your money. ");
-			if (cash > debt) {
-				cash = cash - debt;
-				if (cash > 200) {
-					cash = cash - 200;
-					endGameText.append("They also take an extra $200 as a \"collection charge.\" ");
+		if (health > 0) {
+			if (debt > 0) { // Time to pay up
+				endGameText.append("On the morning of the 31st day, the Shark and his goons burst into your apartment. ");
+				endGameText.append("After viciously beating you, they proceed to tear your place apart for your money. ");
+				if (cash > debt) {
+					cash = cash - debt;
+					if (cash > 200) {
+						cash = cash - 200;
+						endGameText.append("They also take an extra $200 as a \"collection charge.\" ");
+					}
+					else {
+						cash = 0;
+						endGameText.append("They also take an the rest of your cash as a \"collection charge.\" ");
+					}
+					endGameText.append("One of the goons spits in your face as he leaves. \n \n");
 				}
-				else {
+				else { // Oh, Paulie...won't see him no more.
 					cash = 0;
-					endGameText.append("They also take an the rest of your cash as a \"collection charge.\" ");
+					endGameText.append("When they don't find enough to pay your debt, the Shark sighs and motions toward the door. ");
+					endGameText.append("The goons knock you out, and everything goes black. \n \n");
+					health = 0;
 				}
-				endGameText.append("One of the goons spits in your face as he leaves. \n \n");
-				endGameText.append("YOU SURVIVED! \n");
+				
+				debt = 0; // One way or another, you don't owe him any money, now.
 			}
-			else { // Oh, Paulie...won't see him no more.
-				cash = 0;
-				endGameText.append("When they don't find enough to pay your debt, the Shark sighs and motions toward the door. ");
-				endGameText.append("The goons knock you out, and everything goes black. \n \n");
-				endGameText.append("YOU DIED! \n");
+			else { // Very forward-thinking of you!
+				endGameText.append("You paid off the Shark before your loan came due. Smart. \n \n");
 			}
-			
-			debt = 0; // One way or another, you don't owe him any money, now.
 		}
-		else { // Very forward-thinking of you!
-			endGameText.append("You paid off the Shark before your loan came due. Smart. \n \n");
-			endGameText.append("YOU SURVIVED! \n");
-		}
+		
+		String aliveText = (health > 0) ? "YOU SURVIVED! \n" : "YOU DIED! \n";
+		endGameText.append(aliveText);
 		
 		endGameText.append("You earned " + ((cash + bank) * 2) + " points!");
 		
