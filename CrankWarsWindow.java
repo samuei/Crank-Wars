@@ -450,6 +450,7 @@ public class CrankWarsWindow extends Frame {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
 				jetDialog.setVisible(true);
+				jetChoicesOkButton.requestFocusInWindow();
 			}
 		});
 		tradingButtonsPanel.add(jetButton);
@@ -700,7 +701,7 @@ public class CrankWarsWindow extends Frame {
 			public void actionPerformed(ActionEvent evt) {
 				combatText.append("You make a break for it! \n");
 				double retreatSeed = Math.random();
-				if (retreatSeed < 0.7) { // Escape!
+				if (retreatSeed < 0.5) { // Escape!
 					tickerBox.append("You manage to get away. \n");
 					combatDialog.setVisible(false);
 				}
@@ -714,6 +715,7 @@ public class CrankWarsWindow extends Frame {
 					}
 					else { // A hit! A very palpable hit!
 						int damage = (int)(attackerBaseDamage * (Math.random() * 2));
+						damage = damage > 1 ? damage : 1; // Do at least *some* damage!
 						combatText.append("You are shot for " + damage + " HP! \n");
 						health = health - damage;
 						if (health <= 0) { // OH NOES!
@@ -722,6 +724,7 @@ public class CrankWarsWindow extends Frame {
 						}
 					}
 				}
+				refreshStats();
 			}
 		});
 		combatButtonsPanel.add(runCombatButton);
