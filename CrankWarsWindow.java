@@ -10,7 +10,9 @@ public class CrankWarsWindow extends Frame {
 	private int debt = 2000;
 	private int bank = 0;
 	private boolean haveGun = false;
+	private int playerGunBaseDamage = 10;
 	private int ammo = 0;
+	private int attackerHP = 0;
 	private int health = 100;
 	private int day = 1;
 	private int dailyHeals = 3;
@@ -583,8 +585,9 @@ public class CrankWarsWindow extends Frame {
 			else if (eventSeed < 0.02) {
 				tickerBox.append("A street preacher informs everyone that they are doomed. \n");
 			}
-			else if (eventSeed < 1) { // TODO: Change this to a reasonable value once testing is finished
-				combatWindow("Officer Hardass", 100, 10);
+			else if (eventSeed > 0.9) {
+				attackerHP = 100;
+				combatWindow("Officer Hardass", 10);
 			}
 		}
 	}
@@ -650,8 +653,8 @@ public class CrankWarsWindow extends Frame {
 		endGameDialog.setVisible(true);
 	}
 	
-	// TODO: attack, stats.
-	private void combatWindow(String attacker, int attackerHP, int attackerBaseDamage) {
+	// TODO: Consider adding miniature stats panel in here.
+	private void combatWindow(String attacker, int attackerBaseDamage) {
 		Dialog combatDialog = new Dialog(this, "Combat!", true);
 		combatDialog.setLayout(new BorderLayout(3, 3));
 		combatDialog.setSize(300, 300);
@@ -693,7 +696,6 @@ public class CrankWarsWindow extends Frame {
 				combatDialog.setVisible(false);
 			}
 		});
-		combatButtonsPanel.add(surrenderCombatButton);
 		
 		Button runCombatButton = new Button("Run For It");
 		runCombatButton.addActionListener(new ActionListener() {
@@ -720,6 +722,7 @@ public class CrankWarsWindow extends Frame {
 						health = health - damage;
 						if (health <= 0) { // OH NOES!
 							health = 0;
+							combatDialog.setVisible(false);
 							endOfGame();
 						}
 					}
@@ -727,18 +730,69 @@ public class CrankWarsWindow extends Frame {
 				refreshStats();
 			}
 		});
-		combatButtonsPanel.add(runCombatButton);
 		
-		Button exitCombatButton = new Button("Exit Combat");
-		exitCombatButton.addActionListener(new ActionListener() {
+		Button attackCombatButton = new Button("Fight!");
+		attackCombatButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
+				double attackerHitSeed = Math.random();
+				double yourHitSeed = Math.random();
+				int attackerDamage = (int)(attackerBaseDamage * (Math.random() * 2));
+				attackerDamage = attackerDamage > 1 ? attackerDamage : 1; // Do at least *some* damage!
+				int yourDamage = (int)(playerGunBaseDamage * (Math.random() * 2));
+				yourDamage = yourDamage > 1 ? yourDamage : 1; // Do at least *some* damage!
+				if (!haveGun) { // Yeah, that'll go over great.
+					yourDamage = 1;
+					combatText.append("You flail wildly with your fist! \n");
+					if (yourHitSeed < 0.2) { // You're trying to punch a cop, man.
+						combatText.append("You manage to punch " + attacker + " for 1 HP! \n");
+						attackerHP = attackerHP - 1;
+					}
+					else {
+						combatText.append("You miss! How embarrassing! \n");
+					}
+				}
+				else { // BANG!
+					combatText.append("You take a shot with your gun! \n");
+					if (yourHitSeed < 0.5) { 
+						combatText.append("You manage to hit " + attacker + " for " + yourDamage + " HP! \n");
+						attackerHP = attackerHP - yourDamage;
+					}
+					else {
+						combatText.append("You miss! How embarrassing! \n");
+					}
+				}
+				if (attackerHP <= 0) { // He's dead, Jim.
+					refreshStats();
+					tickerBox.append("You have heartlessly murdered " + attacker + "! \n");
+					combatDialog.setVisible(false);
+				}
+				else { // He's alive, angry, and has a gun, Jim.
+					combatText.append(attacker + " takes a shot! \n");
+					if (attackerHitSeed < 0.4 ) { // Attacker's not a crack shot
+						combatText.append("The shot goes wide! \n");
+					}
+					else { // A hit! A very palpable hit!
+						int damage = (int)(attackerBaseDamage * (Math.random() * 2));
+						damage = damage > 1 ? damage : 1; // Do at least *some* damage!
+						combatText.append("You are shot for " + damage + " HP! \n");
+						health = health - damage;
+						if (health <= 0) { // OH NOES!
+							health = 0;
+							combatDialog.setVisible(false);
+							endOfGame();
+						}
+					}
+				}
 				refreshStats();
-				combatDialog.setVisible(false);
 			}
 		});
-		combatButtonsPanel.add(exitCombatButton);
 		
+		// Add buttons to panel
+		combatButtonsPanel.add(attackCombatButton);
+		combatButtonsPanel.add(surrenderCombatButton);
+		combatButtonsPanel.add(runCombatButton);
+
 		combatDialog.add(combatButtonsPanel, BorderLayout.SOUTH);
 		combatDialog.setVisible(true);
 	}
